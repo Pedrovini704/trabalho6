@@ -1,0 +1,67 @@
+#include <stdio.h>
+
+#define MAX_L 100
+#define MAX_C 100
+
+int L, C, P; // Número de linhas, colunas e peças pretas
+int black[MAX_L][MAX_C]; // Matriz para armazenar a posição das peças pretas
+int result = 0; // Variável para armazenar o resultado
+
+// Função para verificar se uma peça branca pode ser colocada em uma determinada posição
+int isWhitePossible(int x, int y) {
+    // Verificar se há uma peça preta como vizinho (acima, abaixo, esquerda, direita)
+    if (x > 0 && black[x - 1][y] == 1) return 0; // Vizinho acima
+    if (x < L - 1 && black[x + 1][y] == 1) return 0; // Vizinho abaixo
+    if (y > 0 && black[x][y - 1] == 1) return 0; // Vizinho à esquerda
+    if (y < C - 1 && black[x][y + 1] == 1) return 0; // Vizinho à direita
+    
+    return 1; // A peça branca pode ser colocada
+}
+
+// Função recursiva para tentar colocar peças brancas
+void placeWhite(int x, int y, int whites) {
+    // Chegou ao final do tabuleiro
+    if (x == L) {
+        // Atualizar o resultado se o número atual de peças brancas for maior
+        if (whites > result) result = whites;
+        return;
+    }
+
+    // Calcular as coordenadas da próxima posição
+    int nextX = (y == C - 1) ? x + 1 : x;
+    int nextY = (y == C - 1) ? 0 : y + 1;
+
+    // Tentar colocar uma peça branca na posição atual
+    if (isWhitePossible(x, y)) {
+        black[x][y] = 0; // Temporariamente remover a peça preta
+        placeWhite(nextX, nextY, whites + 1); // Recursão para a próxima posição
+        black[x][y] = 1; // Restaurar a peça preta após a recursão
+    }
+
+    // Não colocar uma peça branca na posição atual
+    placeWhite(nextX, nextY, whites);
+}
+
+int main() {
+    // Ler entrada
+    printf("Digite o número de linhas e colunas do tabuleiro: ");
+    scanf("%d %d", &L, &C);
+
+    printf("Digite o número de peças pretas: ");
+    scanf("%d", &P);
+
+    printf("Digite as posições das peças pretas (linha coluna):\n");
+    for (int i = 0; i < P; i++) {
+        int x, y;
+        scanf("%d %d", &x, &y);
+        black[x - 1][y - 1] = 1; // Marcar a posição da peça preta
+    }
+
+    // Chamar a função principal
+    placeWhite(0, 0, 0);
+
+    // Imprimir resultado
+    printf("O maior número de peças brancas que podem ser colocadas é: %d\n", result);
+
+    return 0;
+  
